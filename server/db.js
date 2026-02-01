@@ -1,13 +1,14 @@
 const Pool = require('pg').Pool;
 require('dotenv').config();
 
-// Create a connection pool (a group of connections ready to use)
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME
+    // If DATABASE_URL is set (on Render), use it. Otherwise use local vars.
+    connectionString: process.env.DATABASE_URL 
+        ? process.env.DATABASE_URL 
+        : `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    
+    // SSL is REQUIRED for Supabase (and most cloud DBs)
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
 module.exports = pool;
